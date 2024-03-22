@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flask To-Do List</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body.dark-mode {
+            background-color: #343a40;
+            color: #000;
+        }
+        .task-container {
+            border-radius: 10px;
+            overflow: hidden;
+            background-color: #343a40; /* Set background color to dark */
+            color: #000; /* Set text color to white */
+        }
+        .task-item {
+            border-bottom: 1px solid #dee2e6;
+        }
+        .task-item:last-child {
+            border-bottom: none;
+        }
+        .container.mt-4 {
+            border-radius: 10px; /* Add border radius */
+        }
+    </style>
+</head>
+<body class="{{ dark_mode_class }}">
+    <nav class="navbar navbar-dark bg-dark">
+        <span class="navbar-brand mb-0 h1">To-Do List</span>
+        <div>
+            <button id="darkModeToggle" class="btn btn-light">Toggle Dark Mode</button>
+        </div>
+    </nav>
+    <div class="container mt-4">
+        <form class="mb-3" action="{{ url_for('add_task') }}" method="POST">
+            <div class="input-group">
+                <input type="text" class="form-control" name="content" placeholder="Enter task">
+                <div class="input-group-append">
+                    <button class="btn btn-primary" type="submit">Add Task</button>
+                </div>
+            </div>
+        </form>
+        <div class="task-container">
+            <ul class="list-group">
+                {% for task in tasks %}
+                <li class="list-group-item task-item d-flex justify-content-between align-items-center">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="task_{{ task.id }}" {% if task.completed %} checked {% endif %}>
+                        <label class="form-check-label">{{ task.content }}</label>
+                    </div>
+                    <button class="btn btn-danger btn-sm" onclick="deleteTask({{ task.id }})">Delete</button>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+    <!-- Bootstrap JS and jQuery (for dark mode toggle) -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+        // Check local storage for dark mode preference
+        if (localStorage.getItem('darkMode') === 'true') {
+            $('body').addClass('dark-mode');
+        }
+
+        // Dark mode toggle
+        $('#darkModeToggle').click(function() {
+            $('body').toggleClass('dark-mode');
+            var darkModeEnabled = $('body').hasClass('dark-mode');
+            localStorage.setItem('darkMode', darkModeEnabled);
+        });
+
+        // Function to delete a task
+        function deleteTask(taskId) {
+            if (confirm("Are you sure you want to delete this task?")) {
+                window.location.href = '/delete_task/' + taskId;
+            }
+        }
+    </script>
+</body>
+</html>
